@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Venda Certa - Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center">
+                    <div class="bg-blue-100 p-2 rounded-lg">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                        </svg>
+                    </div>
+                    <h1 class="ml-3 text-xl font-semibold text-gray-900">Venda Certa</h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <span class="text-sm text-gray-700">Olá, {{ user }}!</span>
+                    <a href="{{ url_for('logout') }}" class="text-sm text-blue-600 hover:text-blue-500">Sair</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Formulário de Previsão -->
+        <div class="card p-8 mb-8">
+            <div class="flex items-center mb-6">
+                <div class="bg-blue-100 p-3 rounded-full mr-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                    </svg>
+                </div>
+                <h2 class="text-2xl font-bold text-gray-900">Gerar Previsão de Vendas</h2>
+            </div>
+            <form method="POST" class="space-y-6" id="prediction-form">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    <div class="space-y-2">
+                        <label for="scope" class="block text-sm font-semibold text-gray-700">Escopo da Previsão</label>
+                        <select id="scope" name="scope" class="form-input">
+                            <option value="total">Total de Vendas</option>
+                            <option value="category">Por Categoria</option>
+                            <option value="product">Por Produto</option>
+                        </select>
+                    </div>
+                    <div id="category-select" class="hidden space-y-2">
+                        <label for="category" class="block text-sm font-semibold text-gray-700">Categoria</label>
+                        <select id="category" name="category" class="form-input">
+                            {% for cat in categories %}
+                            <option value="{{ cat }}">{{ cat }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div id="product-select" class="hidden space-y-2">
+                        <label for="product" class="block text-sm font-semibold text-gray-700">Produto</label>
+                        <select id="product" name="product" class="form-input">
+                            {% for name, id in product_options.items() %}
+                            <option value="{{ id }}">{{ name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="space-y-2">
+                        <label for="periods" class="block text-sm font-semibold text-gray-700">Períodos (dias)</label>
+                        <input type="number" id="periods" name="periods" value="{{ periods or 30 }}" min="1" max="365" class="form-input" required>
+                    </div>
+                </div>
+                <div class="flex flex-col sm:flex-row gap-4 pt-4">
+                    <button type="submit" name="generate" class="btn-primary hover-scale hover-shadow flex-1 sm:flex-none">
+                        <span class="flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                            </svg>
+                            Gerar Previsão
+                        </span>
+                    </button>
+                    <button type="submit" name="view_predictions" class="btn-secondary hover-scale hover-shadow flex-1 sm:flex-none">
+                        <span class="flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                            </svg>
+                            Ver Previsões Detalhadas
+                        </span>
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Gráfico -->
+        {% if graph_html %}
+        <div class="card p-8 mb-8">
+            <div class="flex items-center mb-6">
+                <div class="bg-green-100 p-3 rounded-full mr-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                    </svg>
+                </div>
+                <h2 class="text-2xl font-bold text-gray-900">Histórico vs Previsão</h2>
+            </div>
+            <div class="w-full bg-gray-50 rounded-lg p-4">
+                {{ graph_html | safe }}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Recomendações de Estoque -->
+        {% if rec_data %}
+        <div class="card p-8 mb-8">
+            <div class="flex items-center mb-6">
+                <div class="bg-purple-100 p-3 rounded-full mr-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                    </svg>
+                </div>
+                <h2 class="text-2xl font-bold text-gray-900">Recomendações de Estoque</h2>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="min-w-full table-zebra">
+                    <thead class="bg-gray-100">
+                        <tr>
+                            <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Data</th>
+                            <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Quantidade Prevista</th>
+                            <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Estoque Recomendado</th>
+                            <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Ação</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white">
+                        {% for rec in rec_data %}
+                        <tr class="hover:bg-gray-50 transition-colors">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ rec.date }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ rec.predicted_quantity | default(0) | round(0) }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-blue-600">{{ rec.recommended_stock | default(0) | round(0) }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                {% if rec.action == 'comprar' %}
+                                    <span class="px-3 py-1 inline-flex text-xs leading-5 font-bold rounded-full bg-green-100 text-green-800 border border-green-200">
+                                        <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                        </svg>
+                                        Comprar
+                                    </span>
+                                {% elif rec.action == 'manter' %}
+                                    <span class="px-3 py-1 inline-flex text-xs leading-5 font-bold rounded-full bg-yellow-100 text-yellow-800 border border-yellow-200">
+                                        <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
+                                        </svg>
+                                        Manter
+                                    </span>
+                                {% elif rec.action == 'vender' %}
+                                    <span class="px-3 py-1 inline-flex text-xs leading-5 font-bold rounded-full bg-red-100 text-red-800 border border-red-200">
+                                        <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                                        </svg>
+                                        Vender
+                                    </span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Tendências de Mercado -->
+        <div class="card p-8">
+            <div class="flex items-center mb-6">
+                <div class="bg-orange-100 p-3 rounded-full mr-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                    </svg>
+                </div>
+                <h2 class="text-2xl font-bold text-gray-900">Tendências de Mercado</h2>
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="space-y-4">
+                    <div class="flex items-center">
+                        <div class="bg-red-100 p-2 rounded-lg mr-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-600" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                            </svg>
+                        </div>
+                        <h3 class="text-lg font-bold text-gray-900">Google Trends</h3>
+                    </div>
+                    <p class="text-sm text-gray-600 leading-relaxed">Dados simulados de tendências de busca relacionadas a compras online no Brasil.</p>
+                    <div class="bg-gradient-to-r from-red-50 to-pink-50 p-4 rounded-lg border border-red-100">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-sm font-medium text-gray-700">Compras Online</span>
+                            <span class="text-sm font-bold text-red-600">+67%</span>
+                        </div>
+                        <div class="w-full bg-red-200 rounded-full h-2">
+                            <div class="bg-red-600 h-2 rounded-full" style="width: 67%"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="space-y-4">
+                    <div class="flex items-center">
+                        <div class="bg-blue-100 p-2 rounded-lg mr-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M.2 8.2c0-.1 0-.2.1-.3.1-.1.2-.2.3-.2L4.5 7c.1 0 .2.1.3.2.1.1.1.2.1.3v8.3c0 .1 0 .2-.1.3-.1.1-.2.2-.3.2l-4 1.1c-.1 0-.2 0-.3-.1-.1-.1-.2-.2-.2-.3V8.2z"/>
+                                <path d="M7.5 6.5c0-.1 0-.2.1-.3.1-.1.2-.2.3-.2l4.2 1.1c.1 0 .2.1.3.2.1.1.1.2.1.3v9.7c0 .1 0 .2-.1.3-.1.1-.2.2-.3.2l-4.2 1.1c-.1 0-.2 0-.3-.1-.1-.1-.2-.2-.2-.3V6.5z"/>
+                                <path d="M14.8 4.8c0-.1 0-.2.1-.3.1-.1.2-.2.3-.2l4.2 1.1c.1 0 .2.1.3.2.1.1.1.2.1.3v11.1c0 .1 0 .2-.1.3-.1.1-.2.2-.3.2l-4.2 1.1c-.1 0-.2 0-.3-.1-.1-.1-.2-.2-.2-.3V4.8z"/>
+                            </svg>
+                        </div>
+                        <h3 class="text-lg font-bold text-gray-900">Amazon Trends</h3>
+                    </div>
+                    <p class="text-sm text-gray-600 leading-relaxed">Produtos em alta com crescimento significativo nas vendas.</p>
+                    <div class="space-y-3">
+                        <div class="flex items-center p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg border border-green-100 hover-scale transition-all">
+                            <div class="flex-shrink-0 w-3 h-3 bg-green-500 rounded-full mr-3"></div>
+                            <span class="text-sm font-semibold text-gray-900">Smartwatch</span>
+                            <span class="ml-auto text-sm font-bold text-green-600">+45%</span>
+                        </div>
+                        <div class="flex items-center p-4 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-lg border border-blue-100 hover-scale transition-all">
+                            <div class="flex-shrink-0 w-3 h-3 bg-blue-500 rounded-full mr-3"></div>
+                            <span class="text-sm font-semibold text-gray-900">Fones Bluetooth</span>
+                            <span class="ml-auto text-sm font-bold text-blue-600">+37%</span>
+                        </div>
+                        <div class="flex items-center p-4 bg-gradient-to-r from-purple-50 to-violet-50 rounded-lg border border-purple-100 hover-scale transition-all">
+                            <div class="flex-shrink-0 w-3 h-3 bg-purple-500 rounded-full mr-3"></div>
+                            <span class="text-sm font-semibold text-gray-900">Tênis Esportivo</span>
+                            <span class="ml-auto text-sm font-bold text-purple-600">+28%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // JavaScript para mostrar/esconder selects dinamicamente
+        document.getElementById('scope').addEventListener('change', function() {
+            const scope = this.value;
+            document.getElementById('category-select').classList.toggle('hidden', scope !== 'category');
+            document.getElementById('product-select').classList.toggle('hidden', scope !== 'product');
+        });
+    </script>
+</body>
+</html>
