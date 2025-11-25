@@ -5,7 +5,7 @@ from bson import ObjectId
 import os
 
 # Connection string do MongoDB Atlas
-MONGODB_URL = os.getenv("MONGODB_URL", "mongodb+srv://davi:reidavi22@vendacerta.jocn1d6.mongodb.net/?appName=vendacerta")
+MONGODB_URL = os.getenv("MONGODB_URL", "")
 
 # Cliente síncrono para operações normais
 client = MongoClient(MONGODB_URL)
