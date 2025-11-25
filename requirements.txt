@@ -1,0 +1,14 @@
+fastapi
+uvicorn[standard]
+flask
+prophet
+httpx
+pytest
+pytest-asyncio
+python-dotenv
+pytrends
+boto3
+bcrypt
+plotly
+pymongo[srv]
+motor

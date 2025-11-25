@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  sales-api:
+    build: ./api
+    ports:
+      - "8000:8000"
+    environment:
+      - MONGODB_URL=mongodb+srv://davi:reidavi22@cluster0.7zqgk.mongodb.net/venda_certa?retryWrites=true&w=majority
+    command: uvicorn sales_api:app --host 0.0.0.0 --port 8000
+
+  predict-api:
+    build: ./api
+    ports:
+      - "8001:8001"
+    depends_on:
+      - sales-api
+    environment:
+      - MONGODB_URL=mongodb+srv://davi:reidavi22@cluster0.7zqgk.mongodb.net/venda_certa?retryWrites=true&w=majority
+      - SALES_API_URL=http://sales-api:8000
+    command: uvicorn predict_api:app --host 0.0.0.0 --port 8001
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "5000:5000"
+    depends_on:
+      - sales-api
+      - predict-api
+    environment:
+      - SALES_API_URL=http://sales-api:8000
+      - PREDICT_API_URL=http://predict-api:8001
+    command: python app.py
