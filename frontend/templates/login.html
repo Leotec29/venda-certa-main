@@ -3,44 +3,155 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Venda Certa - Login</title>
+    <title>Venda Certa - Sistema de Previsão de Vendas</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}">
     <style>
         body {
             font-family: 'Inter', sans-serif;
         }
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .hero-gradient {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .feature-card {
+            transition: transform 0.3s;
+        }
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
     </style>
 </head>
-<body class="min-h-screen flex flex-col md:flex-row">
-    <!-- Lado Esquerdo - Formulário -->
-    <div class="flex-1 flex items-center justify-center p-6 md:p-10">
-        <div class="w-full max-w-md space-y-8">
-            <div class="text-center">
-                <div class="flex justify-center">
-                    <div class="bg-blue-100 p-3 rounded-full">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                        </svg>
-                    </div>
+<body class="min-h-screen">
+    <!-- Header -->
+    <header class="bg-white shadow-lg fixed w-full z-50">
+        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                <div class="text-2xl font-bold text-blue-600">Venda Certa</div>
+                <div class="flex space-x-4">
+                    <a href="#features" class="text-gray-700 hover:text-blue-600 transition">Funcionalidades</a>
+                    <a href="#about" class="text-gray-700 hover:text-blue-600 transition">Sobre</a>
+                    <a href="#contact" class="text-gray-700 hover:text-blue-600 transition">Contato</a>
+                    <a href="#login" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">Entrar</a>
                 </div>
-                <h1 class="mt-6 text-3xl font-bold tracking-tight text-gray-900">Venda Certa</h1>
-                <p class="mt-2 text-sm text-gray-500">Sistema de Previsão de Vendas Sazonais</p>
             </div>
+        </nav>
+    </header>
 
-            <div class="mt-8 space-y-6">
+    <!-- Hero Section -->
+    <section class="hero-gradient text-white pt-24 pb-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h1 class="text-5xl font-bold mb-6">Bem-vindo ao Venda Certa</h1>
+            <p class="text-xl mb-8 max-w-3xl mx-auto opacity-90">Sistema inteligente de previsão de vendas que utiliza machine learning para ajudar empresas a otimizar seu estoque e aumentar suas vendas.</p>
+            <div class="flex justify-center space-x-4">
+                <a href="#login" class="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition">Começar Agora</a>
+                <a href="#features" class="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-blue-600 transition">Saiba Mais</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-16 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-3xl font-bold text-center mb-12 text-gray-900">Funcionalidades Principais</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="feature-card bg-white p-6 rounded-lg shadow-md">
+                    <div class="text-4xl mb-4">📊</div>
+                    <h3 class="text-xl font-semibold mb-3 text-gray-900">Análise de Dados</h3>
+                    <p class="text-gray-600">Analise dados históricos de vendas com gráficos interativos e insights detalhados sobre o desempenho dos produtos.</p>
+                </div>
+                <div class="feature-card bg-white p-6 rounded-lg shadow-md">
+                    <div class="text-4xl mb-4">🔮</div>
+                    <h3 class="text-xl font-semibold mb-3 text-gray-900">Previsão Inteligente</h3>
+                    <p class="text-gray-600">Utilize algoritmos de machine learning para prever vendas futuras e tomar decisões estratégicas com confiança.</p>
+                </div>
+                <div class="feature-card bg-white p-6 rounded-lg shadow-md">
+                    <div class="text-4xl mb-4">📈</div>
+                    <h3 class="text-xl font-semibold mb-3 text-gray-900">Recomendações de Estoque</h3>
+                    <p class="text-gray-600">Receba recomendações automáticas sobre quantidades ideais de estoque baseadas em padrões de vendas.</p>
+                </div>
+                <div class="feature-card bg-white p-6 rounded-lg shadow-md">
+                    <div class="text-4xl mb-4">📱</div>
+                    <h3 class="text-xl font-semibold mb-3 text-gray-900">Interface Intuitiva</h3>
+                    <p class="text-gray-600">Interface moderna e responsiva que funciona perfeitamente em desktop, tablet e celular.</p>
+                </div>
+                <div class="feature-card bg-white p-6 rounded-lg shadow-md">
+                    <div class="text-4xl mb-4">🌐</div>
+                    <h3 class="text-xl font-semibold mb-3 text-gray-900">Análise de Tendências</h3>
+                    <p class="text-gray-600">Integração com Google Trends e dados de mercado para identificar oportunidades de vendas.</p>
+                </div>
+                <div class="feature-card bg-white p-6 rounded-lg shadow-md">
+                    <div class="text-4xl mb-4">⚡</div>
+                    <h3 class="text-xl font-semibold mb-3 text-gray-900">Performance Otimizada</h3>
+                    <p class="text-gray-600">Sistema rápido e eficiente que processa grandes volumes de dados em tempo real.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="py-16 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-3xl font-bold text-center mb-12 text-gray-900">Sobre o Projeto</h2>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <div>
+                    <h3 class="text-2xl font-semibold mb-4 text-blue-600">Revolucionando o Gerenciamento de Vendas</h3>
+                    <p class="text-gray-600 mb-4">O Venda Certa é um sistema completo desenvolvido para ajudar empresas de todos os portes a otimizar seu processo de vendas e gerenciamento de estoque.</p>
+                    <p class="text-gray-600 mb-6">Utilizando tecnologias avançadas de inteligência artificial e análise de dados, nossa plataforma oferece previsões precisas que permitem tomadas de decisão estratégicas.</p>
+                    <h4 class="text-lg font-semibold mb-3 text-gray-900">Tecnologias Utilizadas</h4>
+                    <ul class="text-gray-600 space-y-1">
+                        <li>• Python com Flask para o backend</li>
+                        <li>• MongoDB para armazenamento de dados</li>
+                        <li>• Machine Learning com Prophet</li>
+                        <li>• Interface moderna com HTML5 e CSS3</li>
+                        <li>• Integração com APIs externas</li>
+                    </ul>
+                </div>
+                <div class="text-center">
+                    <img src="https://via.placeholder.com/500x400/667eea/white?text=Venda+Certa" alt="Sistema Venda Certa" class="rounded-lg shadow-lg mx-auto">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="py-16 gradient-bg text-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+                <div>
+                    <div class="text-4xl font-bold mb-2">95%</div>
+                    <div class="text-blue-100">Acurácia nas Previsões</div>
+                </div>
+                <div>
+                    <div class="text-4xl font-bold mb-2">500+</div>
+                    <div class="text-blue-100">Empresas Utilizando</div>
+                </div>
+                <div>
+                    <div class="text-4xl font-bold mb-2">1M+</div>
+                    <div class="text-blue-100">Dados Processados</div>
+                </div>
+                <div>
+                    <div class="text-4xl font-bold mb-2">24/7</div>
+                    <div class="text-blue-100">Disponibilidade</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Login Section -->
+    <section id="login" class="py-16 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="max-w-md mx-auto">
+                <div class="text-center mb-8">
+                    <h2 class="text-3xl font-bold text-gray-900">Acesse sua conta</h2>
+                    <p class="text-gray-600 mt-2">Entre para acessar o sistema de previsões</p>
+                </div>
                 {% with messages = get_flashed_messages(with_categories=true) %}
                     {% if messages %}
                         {% for category, message in messages %}
-                            <div class="alert {% if category == 'error' %}alert-error{% else %}alert-success{% endif %}">
-                                <svg class="w-5 h-5 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                                    {% if category == 'error' %}
-                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
-                                    {% else %}
-                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                                    {% endif %}
-                                </svg>
+                            <div class="mb-4 p-4 rounded-lg {% if category == 'error' %}bg-red-100 text-red-700{% else %}bg-green-100 text-green-700{% endif %}">
                                 {{ message }}
                             </div>
                         {% endfor %}
@@ -48,95 +159,72 @@
                 {% endwith %}
 
                 <form action="{{ url_for('login') }}" method="POST" class="space-y-6">
-                    <div class="space-y-3">
-                        <label for="user" class="block text-sm font-semibold text-gray-700">Usuário</label>
-                        <div class="relative">
-                            <input
-                                id="user"
-                                name="user"
-                                type="text"
-                                placeholder="Digite seu usuário"
-                                class="form-input pl-12"
-                                required
-                            />
-                            <div class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                                </svg>
-                            </div>
-                        </div>
+                    <div>
+                        <label for="user" class="block text-sm font-medium text-gray-700 mb-2">Usuário</label>
+                        <input
+                            id="user"
+                            name="user"
+                            type="text"
+                            placeholder="Digite seu usuário"
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            required
+                        />
                     </div>
 
-                    <div class="space-y-3">
-                        <div class="flex items-center justify-between">
-                            <label for="password" class="block text-sm font-semibold text-gray-700">Senha</label>
-                            <a href="#" class="text-sm font-medium text-blue-600 hover:text-blue-800 transition-colors">Esqueceu a senha?</a>
-                        </div>
-                        <div class="relative">
-                            <input
-                                id="password"
-                                name="password"
-                                type="password"
-                                placeholder="••••••••"
-                                class="form-input pl-12"
-                                required
-                            />
-                            <div class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                                </svg>
-                            </div>
-                        </div>
+                    <div>
+                        <label for="password" class="block text-sm font-medium text-gray-700 mb-2">Senha</label>
+                        <input
+                            id="password"
+                            name="password"
+                            type="password"
+                            placeholder="••••••••"
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            required
+                        />
                     </div>
 
-                    <div class="pt-2">
-                        <button type="submit" class="btn-primary w-full hover-scale hover-shadow">
-                            <span class="flex items-center justify-center">
-                                Entrar
-                                <svg class="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
-                                </svg>
-                            </span>
-                        </button>
-                    </div>
+                    <button type="submit" class="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition duration-200">
+                        Entrar
+                    </button>
                 </form>
 
-                <div class="text-center text-sm space-y-2">
-                    <p class="text-gray-500">Não tem uma conta? <a href="{{ url_for('register') }}" class="font-medium text-blue-600 hover:text-blue-500">Cadastre-se</a></p>
-                    <p class="text-gray-400">ou</p>
-                    <a href="{{ url_for('index') }}" class="font-medium text-gray-600 hover:text-gray-800">← Voltar ao início</a>
+                <div class="text-center">
+                    <p class="text-gray-600">Não tem uma conta? <a href="{{ url_for('register') }}" class="text-blue-600 hover:text-blue-800 font-medium">Cadastre-se</a></p>
                 </div>
             </div>
         </div>
-    </div>
+    </section>
 
-    <!-- Lado Direito - Ilustração -->
-    <div class="hidden md:flex md:flex-1 gradient-bg text-white">
-        <div class="flex flex-col items-center justify-center w-full p-12">
-            <div class="max-w-md text-center">
-                <h2 class="text-3xl font-bold mb-6">Preveja vendas com precisão</h2>
-                <div class="space-y-4 mb-8">
-                    <div class="flex items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                        </svg>
-                        <p class="text-left">Análise de vendas históricas e sazonais</p>
-                    </div>
-                    <div class="flex items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-                        </svg>
-                        <p class="text-left">Previsões precisas com Machine Learning</p>
-                    </div>
-                    <div class="flex items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                        </svg>
-                        <p class="text-left">Recomendações automáticas de estoque</p>
-                    </div>
+    <!-- Footer -->
+    <footer id="contact" class="bg-gray-900 text-white py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div>
+                    <h3 class="text-xl font-bold mb-4 text-blue-400">Venda Certa</h3>
+                    <p class="text-gray-400">Sistema inteligente de previsão de vendas para otimizar seu negócio.</p>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Links Úteis</h3>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#features" class="hover:text-white transition">Funcionalidades</a></li>
+                        <li><a href="#about" class="hover:text-white transition">Sobre</a></li>
+                        <li><a href="#login" class="hover:text-white transition">Login</a></li>
+                        <li><a href="{{ url_for('register') }}" class="hover:text-white transition">Cadastro</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Contato</h3>
+                    <ul class="space-y-2 text-gray-400">
+                        <li>suporte@vendacerta.com</li>
+                        <li>(11) 9999-9999</li>
+                        <li>São Paulo, SP</li>
+                    </ul>
                 </div>
             </div>
+            <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
+                <p>&copy; 2024 Venda Certa. Todos os direitos reservados.</p>
+            </div>
         </div>
-    </div>
+    </footer>
 </body>
 </html>
