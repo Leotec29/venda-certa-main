@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Venda Certa - Sistema de Previsão de Vendas</title>
+    <title>Venda Certa - Login e Cadastro</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -13,218 +13,142 @@
         .gradient-bg {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         }
-        .hero-gradient {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-        .feature-card {
-            transition: transform 0.3s;
-        }
-        .feature-card:hover {
-            transform: translateY(-5px);
-        }
     </style>
 </head>
-<body class="min-h-screen">
-    <!-- Header -->
-    <header class="bg-white shadow-lg fixed w-full z-50">
-        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center py-4">
-                <div class="text-2xl font-bold text-blue-600">Venda Certa</div>
-                <div class="flex space-x-4">
-                    <a href="#features" class="text-gray-700 hover:text-blue-600 transition">Funcionalidades</a>
-                    <a href="#about" class="text-gray-700 hover:text-blue-600 transition">Sobre</a>
-                    <a href="#contact" class="text-gray-700 hover:text-blue-600 transition">Contato</a>
-                    <a href="#login" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">Entrar</a>
+<body class="min-h-screen bg-gray-50">
+    <div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-md w-full space-y-8">
+            <div class="text-center">
+                <h2 class="text-3xl font-bold text-gray-900">Bem-vindo ao Venda Certa</h2>
+                <p class="mt-2 text-sm text-gray-600">Entre na sua conta ou crie uma nova</p>
+            </div>
+
+            <!-- Tabs -->
+            <div class="bg-white shadow rounded-lg overflow-hidden">
+                <div class="border-b border-gray-200">
+                    <nav class="-mb-px flex" aria-label="Tabs">
+                        <button id="login-tab" class="tab-button w-1/2 py-4 px-1 text-center border-b-2 font-medium text-sm" data-tab="login">
+                            Entrar
+                        </button>
+                        <button id="register-tab" class="tab-button w-1/2 py-4 px-1 text-center border-b-2 font-medium text-sm" data-tab="register">
+                            Cadastrar
+                        </button>
+                    </nav>
+                </div>
+
+                <!-- Login Form -->
+                <div id="login-form" class="tab-content p-6">
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="mb-4 p-4 rounded-lg {% if category == 'error' %}bg-red-100 text-red-700{% else %}bg-green-100 text-green-700{% endif %}">
+                                    {{ message }}
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+
+                    <form action="{{ url_for('login') }}" method="POST" class="space-y-6">
+                        <div>
+                            <label for="login-user" class="block text-sm font-medium text-gray-700">Usuário</label>
+                            <input
+                                id="login-user"
+                                name="user"
+                                type="text"
+                                placeholder="Digite seu usuário"
+                                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                                required
+                            />
+                        </div>
+
+                        <div>
+                            <label for="login-password" class="block text-sm font-medium text-gray-700">Senha</label>
+                            <input
+                                id="login-password"
+                                name="password"
+                                type="password"
+                                placeholder="••••••••"
+                                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                                required
+                            />
+                        </div>
+
+                        <button type="submit" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                            Entrar
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Register Form -->
+                <div id="register-form" class="tab-content p-6 hidden">
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="mb-4 p-4 rounded-lg {% if category == 'error' %}bg-red-100 text-red-700{% else %}bg-green-100 text-green-700{% endif %}">
+                                    {{ message }}
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+
+                    <form action="{{ url_for('register') }}" method="POST" class="space-y-6">
+                        <div>
+                            <label for="register-user" class="block text-sm font-medium text-gray-700">Usuário</label>
+                            <input
+                                id="register-user"
+                                name="user"
+                                type="text"
+                                placeholder="Digite seu usuário"
+                                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                                required
+                            />
+                        </div>
+
+                        <div>
+                            <label for="register-password" class="block text-sm font-medium text-gray-700">Senha</label>
+                            <input
+                                id="register-password"
+                                name="password"
+                                type="password"
+                                placeholder="••••••••"
+                                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                                required
+                            />
+                        </div>
+
+                        <button type="submit" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                            Criar Conta
+                        </button>
+                    </form>
                 </div>
             </div>
-        </nav>
-    </header>
 
-    <!-- Hero Section -->
-    <section class="hero-gradient text-white pt-24 pb-16">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h1 class="text-5xl font-bold mb-6">Bem-vindo ao Venda Certa</h1>
-            <p class="text-xl mb-8 max-w-3xl mx-auto opacity-90">Sistema inteligente de previsão de vendas que utiliza machine learning para ajudar empresas a otimizar seu estoque e aumentar suas vendas.</p>
-            <div class="flex justify-center space-x-4">
-                <a href="#login" class="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition">Começar Agora</a>
-                <a href="#features" class="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-blue-600 transition">Saiba Mais</a>
-            </div>
-        </div>
-    </section>
-
-    <!-- Features Section -->
-    <section id="features" class="py-16 bg-gray-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 class="text-3xl font-bold text-center mb-12 text-gray-900">Funcionalidades Principais</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <div class="feature-card bg-white p-6 rounded-lg shadow-md">
-                    <div class="text-4xl mb-4">📊</div>
-                    <h3 class="text-xl font-semibold mb-3 text-gray-900">Análise de Dados</h3>
-                    <p class="text-gray-600">Analise dados históricos de vendas com gráficos interativos e insights detalhados sobre o desempenho dos produtos.</p>
-                </div>
-                <div class="feature-card bg-white p-6 rounded-lg shadow-md">
-                    <div class="text-4xl mb-4">🔮</div>
-                    <h3 class="text-xl font-semibold mb-3 text-gray-900">Previsão Inteligente</h3>
-                    <p class="text-gray-600">Utilize algoritmos de machine learning para prever vendas futuras e tomar decisões estratégicas com confiança.</p>
-                </div>
-                <div class="feature-card bg-white p-6 rounded-lg shadow-md">
-                    <div class="text-4xl mb-4">📈</div>
-                    <h3 class="text-xl font-semibold mb-3 text-gray-900">Recomendações de Estoque</h3>
-                    <p class="text-gray-600">Receba recomendações automáticas sobre quantidades ideais de estoque baseadas em padrões de vendas.</p>
-                </div>
-                <div class="feature-card bg-white p-6 rounded-lg shadow-md">
-                    <div class="text-4xl mb-4">📱</div>
-                    <h3 class="text-xl font-semibold mb-3 text-gray-900">Interface Intuitiva</h3>
-                    <p class="text-gray-600">Interface moderna e responsiva que funciona perfeitamente em desktop, tablet e celular.</p>
-                </div>
-                <div class="feature-card bg-white p-6 rounded-lg shadow-md">
-                    <div class="text-4xl mb-4">🌐</div>
-                    <h3 class="text-xl font-semibold mb-3 text-gray-900">Análise de Tendências</h3>
-                    <p class="text-gray-600">Integração com Google Trends e dados de mercado para identificar oportunidades de vendas.</p>
-                </div>
-                <div class="feature-card bg-white p-6 rounded-lg shadow-md">
-                    <div class="text-4xl mb-4">⚡</div>
-                    <h3 class="text-xl font-semibold mb-3 text-gray-900">Performance Otimizada</h3>
-                    <p class="text-gray-600">Sistema rápido e eficiente que processa grandes volumes de dados em tempo real.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- About Section -->
-    <section id="about" class="py-16 bg-white">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 class="text-3xl font-bold text-center mb-12 text-gray-900">Sobre o Projeto</h2>
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-                <div>
-                    <h3 class="text-2xl font-semibold mb-4 text-blue-600">Revolucionando o Gerenciamento de Vendas</h3>
-                    <p class="text-gray-600 mb-4">O Venda Certa é um sistema completo desenvolvido para ajudar empresas de todos os portes a otimizar seu processo de vendas e gerenciamento de estoque.</p>
-                    <p class="text-gray-600 mb-6">Utilizando tecnologias avançadas de inteligência artificial e análise de dados, nossa plataforma oferece previsões precisas que permitem tomadas de decisão estratégicas.</p>
-                    <h4 class="text-lg font-semibold mb-3 text-gray-900">Tecnologias Utilizadas</h4>
-                    <ul class="text-gray-600 space-y-1">
-                        <li>• Python com Flask para o backend</li>
-                        <li>• MongoDB para armazenamento de dados</li>
-                        <li>• Machine Learning com Prophet</li>
-                        <li>• Interface moderna com HTML5 e CSS3</li>
-                        <li>• Integração com APIs externas</li>
-                    </ul>
-                </div>
-                <div class="text-center">
-                    <img src="https://via.placeholder.com/500x400/667eea/white?text=Venda+Certa" alt="Sistema Venda Certa" class="rounded-lg shadow-lg mx-auto">
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Stats Section -->
-    <section class="py-16 gradient-bg text-white">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-                <div>
-                    <div class="text-4xl font-bold mb-2">95%</div>
-                    <div class="text-blue-100">Acurácia nas Previsões</div>
-                </div>
-                <div>
-                    <div class="text-4xl font-bold mb-2">500+</div>
-                    <div class="text-blue-100">Empresas Utilizando</div>
-                </div>
-                <div>
-                    <div class="text-4xl font-bold mb-2">1M+</div>
-                    <div class="text-blue-100">Dados Processados</div>
-                </div>
-                <div>
-                    <div class="text-4xl font-bold mb-2">24/7</div>
-                    <div class="text-blue-100">Disponibilidade</div>
-                </div>
+            <div class="text-center">
+                <a href="{{ url_for('homepage') }}" class="text-blue-600 hover:text-blue-500">Voltar à página inicial</a>
             </div>
         </div>
-    </section>
+    </div>
 
-    <!-- Login Section -->
-    <section id="login" class="py-16 bg-gray-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="max-w-md mx-auto">
-                <div class="text-center mb-8">
-                    <h2 class="text-3xl font-bold text-gray-900">Acesse sua conta</h2>
-                    <p class="text-gray-600 mt-2">Entre para acessar o sistema de previsões</p>
-                </div>
-                {% with messages = get_flashed_messages(with_categories=true) %}
-                    {% if messages %}
-                        {% for category, message in messages %}
-                            <div class="mb-4 p-4 rounded-lg {% if category == 'error' %}bg-red-100 text-red-700{% else %}bg-green-100 text-green-700{% endif %}">
-                                {{ message }}
-                            </div>
-                        {% endfor %}
-                    {% endif %}
-                {% endwith %}
+    <script>
+        const loginTab = document.getElementById('login-tab');
+        const registerTab = document.getElementById('register-tab');
+        const loginForm = document.getElementById('login-form');
+        const registerForm = document.getElementById('register-form');
 
-                <form action="{{ url_for('login') }}" method="POST" class="space-y-6">
-                    <div>
-                        <label for="user" class="block text-sm font-medium text-gray-700 mb-2">Usuário</label>
-                        <input
-                            id="user"
-                            name="user"
-                            type="text"
-                            placeholder="Digite seu usuário"
-                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                            required
-                        />
-                    </div>
+        function switchTab(activeTab, inactiveTab, showForm, hideForm) {
+            activeTab.classList.add('border-blue-500', 'text-blue-600');
+            activeTab.classList.remove('border-transparent', 'text-gray-500');
+            inactiveTab.classList.remove('border-blue-500', 'text-blue-600');
+            inactiveTab.classList.add('border-transparent', 'text-gray-500');
+            showForm.classList.remove('hidden');
+            hideForm.classList.add('hidden');
+        }
 
-                    <div>
-                        <label for="password" class="block text-sm font-medium text-gray-700 mb-2">Senha</label>
-                        <input
-                            id="password"
-                            name="password"
-                            type="password"
-                            placeholder="••••••••"
-                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                            required
-                        />
-                    </div>
+        loginTab.addEventListener('click', () => switchTab(loginTab, registerTab, loginForm, registerForm));
+        registerTab.addEventListener('click', () => switchTab(registerTab, loginTab, registerForm, loginForm));
 
-                    <button type="submit" class="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition duration-200">
-                        Entrar
-                    </button>
-                </form>
-
-                <div class="text-center">
-                    <p class="text-gray-600">Não tem uma conta? <a href="{{ url_for('register') }}" class="text-blue-600 hover:text-blue-800 font-medium">Cadastre-se</a></p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer id="contact" class="bg-gray-900 text-white py-12">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div>
-                    <h3 class="text-xl font-bold mb-4 text-blue-400">Venda Certa</h3>
-                    <p class="text-gray-400">Sistema inteligente de previsão de vendas para otimizar seu negócio.</p>
-                </div>
-                <div>
-                    <h3 class="text-lg font-semibold mb-4">Links Úteis</h3>
-                    <ul class="space-y-2 text-gray-400">
-                        <li><a href="#features" class="hover:text-white transition">Funcionalidades</a></li>
-                        <li><a href="#about" class="hover:text-white transition">Sobre</a></li>
-                        <li><a href="#login" class="hover:text-white transition">Login</a></li>
-                        <li><a href="{{ url_for('register') }}" class="hover:text-white transition">Cadastro</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h3 class="text-lg font-semibold mb-4">Contato</h3>
-                    <ul class="space-y-2 text-gray-400">
-                        <li>suporte@vendacerta.com</li>
-                        <li>(11) 9999-9999</li>
-                        <li>São Paulo, SP</li>
-                    </ul>
-                </div>
-            </div>
-            <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-                <p>&copy; 2024 Venda Certa. Todos os direitos reservados.</p>
-            </div>
-        </div>
-    </footer>
+        // Default to login tab
+        switchTab(loginTab, registerTab, loginForm, registerForm);
+    </script>
 </body>
 </html>
