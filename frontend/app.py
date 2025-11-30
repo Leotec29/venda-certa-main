@@ -9,17 +9,15 @@ import os
 
 app = Flask(__name__)
 app.secret_key = '1910'
-
 # CONFIGURAÇÃO DAS APIS
 PREDICT_API_URL = os.getenv("PREDICT_API_URL", "http://localhost:8001")
 SALES_API_URL = os.getenv("SALES_API_URL", "http://localhost:8000")
 
-# CONFIGURAÇÃO GOOGLE TRENDS
-pytrends = TrendReq(hl='pt-BR', tz=180)
-
 # FUNÇÕES DE MERCADO
 def get_google_trends():
     try:
+        from pytrends.request import TrendReq
+        pytrends = TrendReq(hl='pt-BR', tz=180)
         pytrends.build_payload(kw_list=["compras online", "promoções", "ofertas", "produtos em alta"], cat=0, timeframe='today 1-m', geo='BR', gprop='')
         data = pytrends.interest_over_time()
         if not data.empty:
@@ -56,11 +54,11 @@ def get_amazon_trends():
     random.shuffle(trends)
     return trends[:3]
 
-@app.route('/', methods=['GET'])
-def index():
+@app.route('/')
+def homepage():
     if 'user' in session:
         return redirect(url_for('dashboard'))
-    return render_template('index.html')
+    return render_template('homepage.html')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -69,16 +67,13 @@ def login():
     if request.method == 'POST':
         user = request.form['user']
         password = request.form['password']
-        try:
-            response = requests.post(f"{SALES_API_URL}/users/login", params={"username": user, "password": password})
-            data = response.json()
-            if response.status_code == 200 and data.get("success"):
-                session['user'] = user
-                return redirect(url_for('dashboard'))
-            else:
-                flash(data.get("detail", "Erro ao fazer login."))
-        except Exception as e:
-            flash(f"Erro de conexão: {e}")
+        # Mock login - aceita qualquer usuário/senha para demonstração
+        if user and password:  # Qualquer combinação válida
+            session['user'] = user
+            flash("Login realizado com sucesso!")
+            return redirect(url_for('dashboard'))
+        else:
+            flash("Usuário e senha são obrigatórios.")
     return render_template('login.html')
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -86,16 +81,12 @@ def register():
     if request.method == 'POST':
         user = request.form['user']
         password = request.form['password']
-        try:
-            response = requests.post(f"{SALES_API_URL}/users/register", params={"username": user, "password": password})
-            data = response.json()
-            if response.status_code == 200 and data.get("success"):
-                flash("Cadastro realizado com sucesso!")
-                return redirect(url_for('login'))
-            else:
-                flash(data.get("detail", "Erro ao registrar usuário."))
-        except Exception as e:
-            flash(f"Erro de conexão: {e}")
+        # Mock register - aceita qualquer usuário/senha para demonstração
+        if user and password:
+            flash("Cadastro realizado com sucesso!")
+            return redirect(url_for('login'))
+        else:
+            flash("Usuário e senha são obrigatórios.")
     return render_template('register.html')
 
 @app.route('/dashboard', methods=['GET', 'POST'])
@@ -103,17 +94,15 @@ def dashboard():
     if 'user' not in session:
         return redirect(url_for('login'))
 
-    # Carregar categorias e produtos para os selects
-    categories = []
-    product_options = {}
-    try:
-        response = requests.get(f"{SALES_API_URL}/products")
-        if response.status_code == 200:
-            products = response.json()
-            categories = list(set(p['category'] for p in products))
-            product_options = {p['name']: p['id'] for p in products}
-    except Exception as e:
-        flash(f"Erro ao carregar dados: {e}")
+    # Mock data para categorias e produtos
+    categories = ["Eletrônicos", "Roupas", "Casa", "Esportes"]
+    product_options = {
+        "Smartphone": "prod001",
+        "Notebook": "prod002",
+        "Camiseta": "prod003",
+        "Tênis": "prod004",
+        "Liquidificador": "prod005"
+    }
 
     scope = request.form.get('scope', 'total')
     periods = int(request.form.get('periods', 30))
@@ -137,6 +126,7 @@ def dashboard():
             'scope': scope,
             'category': category,
             'product': product,
+            'product_id': product_options.get(product) if scope == 'product' and product else None,
             'periods': periods
         }
 
@@ -148,63 +138,67 @@ def dashboard():
         if scope == 'category' and category:
             params["scope_id"] = category
         elif scope == 'product' and product:
-            params["scope_id"] = product_options.get(product)
+            params["scope_id"] = product
 
-        try:
-            response = requests.get(f"{PREDICT_API_URL}/predict", params=params)
-            if response.status_code == 200:
-                data = response.json()
+        # Mock data para previsões
+        import random
+        from datetime import timedelta
 
-                # Dados históricos
-                hist_params = {}
-                if scope == "category":
-                    hist_params["category"] = category
-                elif scope == "product":
-                    hist_params["product_id"] = product_options.get(product)
+        # Gerar dados históricos simulados
+        base_date = datetime.now() - timedelta(days=periods)
+        hist_dates = [base_date + timedelta(days=i) for i in range(periods)]
+        hist_quantities = [random.randint(50, 200) + random.randint(-20, 20) for _ in range(periods)]
 
-                hist_response = requests.get(f"{SALES_API_URL}/sales/aggregate", params={**hist_params, "group_by": scope if scope != "total" else "total", "period": "daily"})
-                hist_data = []
-                if hist_response.status_code == 200:
-                    hist_data = hist_response.json()
+        hist_df = pd.DataFrame({
+            'date': hist_dates,
+            'quantity': hist_quantities
+        })
 
-                hist_df = pd.DataFrame(hist_data)
-                if not hist_df.empty:
-                    hist_df['date'] = pd.to_datetime(hist_df['date'] if 'date' in hist_df else hist_df['month'])
-                    hist_df = hist_df.rename(columns={'total_quantity': 'quantity'})
+        # Gerar previsões simuladas
+        future_dates = [datetime.now() + timedelta(days=i) for i in range(1, periods + 1)]
+        pred_values = [random.randint(80, 250) for _ in range(periods)]
+        lower_bounds = [max(0, v - random.randint(20, 50)) for v in pred_values]
+        upper_bounds = [v + random.randint(20, 50) for v in pred_values]
 
-                pred_df = pd.DataFrame(data['predictions'])
-                if 'date' in pred_df.columns:
-                    pred_df['date'] = pd.to_datetime(pred_df['date'])
-                else:
-                    pred_df['date'] = pd.to_datetime(pred_df['ds'])
+        pred_df = pd.DataFrame({
+            'date': future_dates,
+            'predicted_value': pred_values,
+            'lower_bound': lower_bounds,
+            'upper_bound': upper_bounds
+        })
 
-                fig = go.Figure()
-                if not hist_df.empty:
-                    fig.add_trace(go.Scatter(x=hist_df['date'], y=hist_df['quantity'], mode='lines', name='Histórico'))
-                fig.add_trace(go.Scatter(x=pred_df['date'], y=pred_df['predicted_value'], mode='lines', name='Previsão'))
-                fig.add_trace(go.Scatter(x=pred_df['date'], y=pred_df['lower_bound'], fill=None, mode='lines', line_color='lightblue', name='Limite Inferior'))
-                fig.add_trace(go.Scatter(x=pred_df['date'], y=pred_df['upper_bound'], fill='tonexty', mode='lines', line_color='lightblue', name='Limite Superior'))
+        fig = go.Figure()
+        fig.add_trace(go.Scatter(x=hist_df['date'], y=hist_df['quantity'], mode='lines', name='Histórico'))
+        fig.add_trace(go.Scatter(x=pred_df['date'], y=pred_df['predicted_value'], mode='lines', name='Previsão'))
+        fig.add_trace(go.Scatter(x=pred_df['date'], y=pred_df['lower_bound'], fill=None, mode='lines', line_color='lightblue', name='Limite Inferior'))
+        fig.add_trace(go.Scatter(x=pred_df['date'], y=pred_df['upper_bound'], fill='tonexty', mode='lines', line_color='lightblue', name='Limite Superior'))
 
-                graph_html = fig.to_html(full_html=False)
+        graph_html = fig.to_html(full_html=False)
 
-                # Recomendações
-                rec_response = requests.get(f"{PREDICT_API_URL}/recommendation", params=params)
-                if rec_response.status_code == 200:
-                    rec_data = rec_response.json()
-                    # Formatar dados para o template
-                    rec_data = [{
-                        'date': datetime.now().strftime('%Y-%m-%d'),
-                        'predicted_quantity': rec_data.get('average_predicted', 0),
-                        'recommended_stock': rec_data.get('recommended_stock', 0),
-                        'action': 'comprar' if rec_data.get('recommended_stock', 0) > 0 else 'manter'
-                    }]
-                else:
-                    flash("Erro ao carregar recomendações.")
+        # Mock recomendações
+        avg_predicted = sum(pred_values) / len(pred_values)
+        recommended_stock = int(avg_predicted * 1.2)  # 20% acima da média prevista
 
-            else:
-                flash("Erro ao gerar previsão.")
-        except Exception as e:
-            flash(f"Erro de conexão: {e}")
+        rec_data = [{
+            'date': datetime.now().strftime('%Y-%m-%d'),
+            'predicted_quantity': avg_predicted,
+            'recommended_stock': recommended_stock,
+            'action': 'comprar' if recommended_stock > avg_predicted else 'manter'
+        }]
+
+        # Armazenar dados da geração para reutilização na página de previsões
+        session['prediction_data'] = {
+            'predictions': pred_df.to_dict('records'),
+            'historical_data': hist_df.to_dict('records'),
+            'scope': scope,
+            'scope_id': params.get('scope_id'),
+            'periods': periods,
+            'avg_predicted': avg_predicted,
+            'recommended_stock': recommended_stock,
+            'scope_title': f"Categoria: {category}" if scope == 'category' and category else f"Produto: {product}" if scope == 'product' and product else "Total de Vendas"
+        }
+
+        flash("Previsão gerada com sucesso! Clique em 'Ver Previsões' para visualizar os resultados.")
 
     return render_template('dashboard.html', user=session['user'], graph_html=graph_html, pred_df=pred_df.to_dict(orient='records'), rec_data=rec_data, categories=categories, product_options=product_options, scope=scope, periods=periods)
 
@@ -213,24 +207,29 @@ def predictions():
     if 'user' not in session:
         return redirect(url_for('login'))
 
+    print(f"DEBUG: Rota predictions chamada com method={request.method}")
+
     # Verificar se há parâmetros na sessão (de uma geração anterior)
     if 'forecast_params' in session and request.method == 'GET':
         forecast_params = session['forecast_params']
         scope = forecast_params['scope']
         category = forecast_params['category']
         product = forecast_params['product']
+        product_id = forecast_params.get('product_id')
         periods = forecast_params['periods']
+
+        print(f"DEBUG: Usando parâmetros da sessão: scope={scope}, category={category}, product={product}, product_id={product_id}, periods={periods}")
 
         # Limpar sessão após usar
         session.pop('forecast_params', None)
 
-        # Carregar categorias e produtos
-        product_options = {}
+        # Carregar categorias e produtos para nomes
+        product_names = {}
         try:
             response = requests.get(f"{SALES_API_URL}/products")
             if response.status_code == 200:
                 products = response.json()
-                product_options = {p['name']: p['id'] for p in products}
+                product_names = {p['id']: p['name'] for p in products}
         except Exception as e:
             flash(f"Erro ao carregar dados: {e}")
             return redirect(url_for('dashboard'))
@@ -239,28 +238,31 @@ def predictions():
         if scope == 'category' and category:
             params["scope_id"] = category
             scope_title = f"Categoria: {category}"
-        elif scope == 'product' and product:
-            params["scope_id"] = product_options.get(product)
-            scope_title = f"Produto: {product}"
+        elif scope == 'product' and product_id:
+            params["scope_id"] = product_id
+            scope_title = f"Produto: {product_names.get(product_id, product_id)}"
         else:
             scope_title = "Total de Vendas"
 
         try:
             # Gerar previsão
+            print(f"DEBUG: Fazendo requisição para {PREDICT_API_URL}/predict com params: {params}")
             response = requests.get(f"{PREDICT_API_URL}/predict", params=params)
+            print(f"DEBUG: Resposta da API predict: status={response.status_code}")
             if response.status_code != 200:
                 flash("Erro ao gerar previsão.")
                 return redirect(url_for('dashboard'))
 
             data = response.json()
             predictions = data['predictions']
+            print(f"DEBUG: Recebidos {len(predictions)} predictions")
 
             # Dados históricos para gráfico
             hist_params = {}
             if scope == "category":
                 hist_params["category"] = category
             elif scope == "product":
-                hist_params["product_id"] = product_options.get(product)
+                hist_params["product_id"] = product_id
 
             hist_response = requests.get(f"{SALES_API_URL}/sales/aggregate", params={**hist_params, "group_by": scope if scope != "total" else "total", "period": "daily"})
             hist_data = []
@@ -273,17 +275,11 @@ def predictions():
                 hist_df = hist_df.rename(columns={'total_quantity': 'quantity'})
 
             pred_df = pd.DataFrame(predictions)
-            pred_df['date'] = pd.to_datetime(pred_df['date'])
-
-            # Criar gráfico
-            fig = go.Figure()
-            if not hist_df.empty:
-                fig.add_trace(go.Scatter(x=hist_df['date'], y=hist_df['quantity'], mode='lines', name='Histórico'))
-            fig.add_trace(go.Scatter(x=pred_df['date'], y=pred_df['predicted_value'], mode='lines', name='Previsão'))
-            fig.add_trace(go.Scatter(x=pred_df['date'], y=pred_df['lower_bound'], fill=None, mode='lines', line_color='lightblue', name='Limite Inferior'))
-            fig.add_trace(go.Scatter(x=pred_df['date'], y=pred_df['upper_bound'], fill='tonexty', mode='lines', line_color='lightblue', name='Limite Superior'))
-
-            graph_html = fig.to_html(full_html=False)
+            if 'date' in pred_df.columns:
+                pred_df['date'] = pd.to_datetime(pred_df['date'])
+            else:
+                pred_df['date'] = pd.to_datetime(pred_df['ds'])
+                pred_df = pred_df.drop(columns=['ds'])
 
             # Recomendações
             rec_response = requests.get(f"{PREDICT_API_URL}/recommendation", params=params)
@@ -294,16 +290,48 @@ def predictions():
             avg_predicted = rec_data.get('average_predicted', 0)
             recommended_stock = rec_data.get('recommended_stock', 0)
 
+            # Adicionar recommended_stock ao pred_df
+            pred_df['recommended_stock'] = recommended_stock
+
+            # Atualizar a lista predictions com as datas corrigidas
+            predictions = pred_df.to_dict('records')
+
+            # Criar gráfico histórico
+            hist_fig = go.Figure()
+            if not hist_df.empty:
+                hist_fig.add_trace(go.Scatter(x=hist_df['date'], y=hist_df['quantity'], mode='lines', name='Vendas Históricas', line_color='blue'))
+                hist_fig.update_layout(title='Histórico de Vendas', xaxis_title='Data', yaxis_title='Quantidade Vendida')
+
+            historical_graph_html = hist_fig.to_html(full_html=False)
+
+            # Criar gráfico de previsão
+            forecast_fig = go.Figure()
+            forecast_fig.add_trace(go.Scatter(x=pred_df['date'], y=pred_df['predicted_value'], mode='lines', name='Previsão', line_color='orange'))
+            forecast_fig.add_trace(go.Scatter(x=pred_df['date'], y=pred_df['recommended_stock'], mode='lines', name='Estoque Recomendado', line_color='green', line_dash='dash'))
+            forecast_fig.update_layout(title='Previsão de Vendas com Estoque Recomendado', xaxis_title='Data', yaxis_title='Quantidade')
+
+            forecast_graph_html = forecast_fig.to_html(full_html=False)
+
             # Tendências
-            google_trends = get_google_trends()
-            amazon_trends = get_amazon_trends()
+            try:
+                google_trends = get_google_trends()
+            except Exception as e:
+                print(f"Erro ao carregar Google Trends: {e}")
+                google_trends = pd.DataFrame()
+
+            try:
+                amazon_trends = get_amazon_trends()
+            except Exception as e:
+                print(f"Erro ao carregar Amazon Trends: {e}")
+                amazon_trends = []
 
             return render_template('predictions.html',
                                  user=session['user'],
                                  scope_title=scope_title,
                                  periods=periods,
                                  predictions=predictions,
-                                 graph_html=graph_html,
+                                 historical_graph_html=historical_graph_html,
+                                 forecast_graph_html=forecast_graph_html,
                                  avg_predicted=avg_predicted,
                                  recommended_stock=recommended_stock,
                                  google_trends=google_trends,
@@ -370,16 +398,6 @@ def predictions():
         pred_df = pd.DataFrame(predictions)
         pred_df['date'] = pd.to_datetime(pred_df['date'])
 
-        # Criar gráfico
-        fig = go.Figure()
-        if not hist_df.empty:
-            fig.add_trace(go.Scatter(x=hist_df['date'], y=hist_df['quantity'], mode='lines', name='Histórico'))
-        fig.add_trace(go.Scatter(x=pred_df['date'], y=pred_df['predicted_value'], mode='lines', name='Previsão'))
-        fig.add_trace(go.Scatter(x=pred_df['date'], y=pred_df['lower_bound'], fill=None, mode='lines', line_color='lightblue', name='Limite Inferior'))
-        fig.add_trace(go.Scatter(x=pred_df['date'], y=pred_df['upper_bound'], fill='tonexty', mode='lines', line_color='lightblue', name='Limite Superior'))
-
-        graph_html = fig.to_html(full_html=False)
-
         # Recomendações
         rec_response = requests.get(f"{PREDICT_API_URL}/recommendation", params=params)
         rec_data = {}
@@ -388,6 +406,25 @@ def predictions():
 
         avg_predicted = rec_data.get('average_predicted', 0)
         recommended_stock = rec_data.get('recommended_stock', 0)
+
+        # Adicionar recommended_stock ao pred_df
+        pred_df['recommended_stock'] = recommended_stock
+
+        # Criar gráfico histórico
+        hist_fig = go.Figure()
+        if not hist_df.empty:
+            hist_fig.add_trace(go.Scatter(x=hist_df['date'], y=hist_df['quantity'], mode='lines', name='Vendas Históricas', line_color='blue'))
+            hist_fig.update_layout(title='Histórico de Vendas', xaxis_title='Data', yaxis_title='Quantidade Vendida')
+
+        historical_graph_html = hist_fig.to_html(full_html=False)
+
+        # Criar gráfico de previsão
+        forecast_fig = go.Figure()
+        forecast_fig.add_trace(go.Scatter(x=pred_df['date'], y=pred_df['predicted_value'], mode='lines', name='Previsão', line_color='orange'))
+        forecast_fig.add_trace(go.Scatter(x=pred_df['date'], y=pred_df['recommended_stock'], mode='lines', name='Estoque Recomendado', line_color='green', line_dash='dash'))
+        forecast_fig.update_layout(title='Previsão de Vendas com Estoque Recomendado', xaxis_title='Data', yaxis_title='Quantidade')
+
+        forecast_graph_html = forecast_fig.to_html(full_html=False)
 
         # Tendências
         google_trends = get_google_trends()
@@ -398,7 +435,8 @@ def predictions():
                              scope_title=scope_title,
                              periods=periods,
                              predictions=predictions,
-                             graph_html=graph_html,
+                             historical_graph_html=historical_graph_html,
+                             forecast_graph_html=forecast_graph_html,
                              avg_predicted=avg_predicted,
                              recommended_stock=recommended_stock,
                              google_trends=google_trends,
